@@ -51,12 +51,15 @@ public class ExploreFileTree implements FileVisitor<Path> {
         String extension = strFile.substring(strFile.lastIndexOf('.')+1, strFile.length());
         String name = strFile.substring(strFile.lastIndexOf('\\')+1,strFile.lastIndexOf('.'));
         String filePath = strFile.substring(0, strFile.lastIndexOf('\\'));
+        String datetime = attr.lastModifiedTime().toString().substring(0,19);
         char drive = strFile.substring(0,2).charAt(0);
         
         if(!name.isEmpty() && !extension.isEmpty() ) {
-        	File newFile = new File(filePath, name, drive , extension, attr.size(), attr.lastModifiedTime().toString());
-        	fdao.saveFile(newFile);
+               File newFile = new File(filePath, name, drive , extension, attr.size(), datetime);
+               fdao.saveFile(newFile);
         }
+        
+
         
         return CONTINUE;
     }
