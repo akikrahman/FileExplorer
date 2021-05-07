@@ -48,10 +48,25 @@ public class ExploreFileTree implements FileVisitor<Path> {
     	
     	String strFile = file.toString();
     	
-        String extension = strFile.substring(strFile.lastIndexOf('.')+1, strFile.length());
-        String name = strFile.substring(strFile.lastIndexOf('\\')+1,strFile.lastIndexOf('.'));
+        String extension = "";
+        
+        if(strFile.contains(".")) {
+        	extension = strFile.substring(strFile.lastIndexOf('.')+1, strFile.length());
+        	if(extension.length()>20) extension = ""; //an invalid extension found, more than 20 chars
+        }
+        
+        String name="";
+        
+        if(strFile.contains("\\") && strFile.contains(".")) {
+        	name = strFile.substring(strFile.lastIndexOf('\\')+1,strFile.lastIndexOf('.'));
+        }
+        else if(strFile.contains("\\")) {
+        	//there is no file extension for this file
+        	name = strFile.substring(strFile.lastIndexOf('\\')+1,strFile.length());
+        }
+        	        
         String filePath = strFile.substring(0, strFile.lastIndexOf('\\'));
-        String datetime = attr.lastModifiedTime().toString().substring(0,19);
+        String datetime = attr.lastModifiedTime().toString().substring(0,19); //should be max 19 chars
         char drive = strFile.substring(0,2).charAt(0);
         
         if(!name.isEmpty() && !extension.isEmpty() ) {

@@ -13,19 +13,14 @@ import com.akikrahman.model.File;
 
 import oracle.jdbc.pool.OracleDataSource;
 
-public class FileDAOImpl implements FileDAO {
+public class FileDAOImpl implements FileDAO, AutoCloseable {
 
 	OracleDataSource ods;
 	Connection conn;
 	private final String COMMA = ",";
 	private final String SINGLE_QOUTE = "'";
 
-	public static FileDAOImpl getFileDAOImpl() {
-		return new FileDAOImpl();
-	}
-
 	public FileDAOImpl() {
-
 		try {
 
 			FileReader reader = new FileReader("application.properties");
@@ -52,6 +47,7 @@ public class FileDAOImpl implements FileDAO {
 		} catch (IOException ioe) {
 			System.out.println("Message:   " + ioe.getMessage());
 		}
+
 	}
 
 	public boolean saveFile(File file) {
@@ -67,7 +63,8 @@ public class FileDAOImpl implements FileDAO {
 					+ "', 'yyyy-mm-dd hh24:mi:ss')" + " )";
 			PreparedStatement stmt = conn.prepareStatement(statement);
 			stmt.executeQuery();
-
+			stmt.close();
+			
 		} catch (SQLException ex) {
 
 			result = false;
@@ -83,8 +80,20 @@ public class FileDAOImpl implements FileDAO {
 				}
 				ex = ex.getNextException();
 			}
+
+			try {
+				// close the sql connection
+				conn.close();
+			} catch (SQLException exc) {
+				System.out.println("Message:   " + exc.getMessage());
+			}
 		}
 
 		return result;
+	}
+
+
+	public void close() throws SQLException {
+		conn.close();
 	}
 }
