@@ -8,7 +8,7 @@ create table files (
  , drive        char(1 char) not null
  , name         varchar2(256 char) not null
  , extension    varchar2(20 char) not null
- , file_size    int not null
+ , file_size    number(16,0) not null
  , modified_date date 
 );
 
