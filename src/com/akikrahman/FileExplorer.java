@@ -29,7 +29,7 @@ public class FileExplorer {
 	        } catch (IOException e) {
 	            System.out.println("Exception: " + e);
 	        } catch(Exception e) {
-	        	 System.out.println("Error closing the connection to the database: " + e);
+	        	 System.out.println("Exception occurred: " + e);
 	             System.exit(-1);
 	        }
 	    }

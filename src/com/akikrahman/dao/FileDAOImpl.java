@@ -15,11 +15,11 @@ import oracle.jdbc.pool.OracleDataSource;
 
 public class FileDAOImpl implements FileDAO, AutoCloseable {
 
-	OracleDataSource ods;
-	Connection conn;
 	private final String COMMA = ",";
 	private final String SINGLE_QOUTE = "'";
-
+	OracleDataSource ods;
+	Connection conn;
+	
 	public FileDAOImpl() {
 		try {
 
@@ -55,16 +55,16 @@ public class FileDAOImpl implements FileDAO, AutoCloseable {
 
 		String updatedDate = file.getDate().replace('T', ' ').replace('Z', ' ').trim();
 
-		try {
-			String statement = "INSERT INTO files (path,drive,name,extension,file_size,modified_date) " + "VALUES ("
-					+ SINGLE_QOUTE + file.getPath() + SINGLE_QOUTE + COMMA + SINGLE_QOUTE + file.getDrive()
-					+ SINGLE_QOUTE + COMMA + SINGLE_QOUTE + file.getName() + SINGLE_QOUTE + COMMA + SINGLE_QOUTE
-					+ file.getExtension() + SINGLE_QOUTE + COMMA + file.getSize() + COMMA + " to_date('" + updatedDate
-					+ "', 'yyyy-mm-dd hh24:mi:ss')" + " )";
-			PreparedStatement stmt = conn.prepareStatement(statement);
-			stmt.executeQuery();
-			stmt.close();
+		String statement = "INSERT INTO files (path,drive,name,extension,file_size,modified_date) " + "VALUES ("
+				+ SINGLE_QOUTE + file.getPath() + SINGLE_QOUTE + COMMA + SINGLE_QOUTE + file.getDrive()
+				+ SINGLE_QOUTE + COMMA + SINGLE_QOUTE + file.getName() + SINGLE_QOUTE + COMMA + SINGLE_QOUTE
+				+ file.getExtension() + SINGLE_QOUTE + COMMA + file.getSize() + COMMA + " to_date('" + updatedDate
+				+ "', 'yyyy-mm-dd hh24:mi:ss')" + " )";
+		
+		try(PreparedStatement stmt = conn.prepareStatement(statement);) {
 			
+			stmt.executeQuery();
+
 		} catch (SQLException ex) {
 
 			result = false;
@@ -73,6 +73,7 @@ public class FileDAOImpl implements FileDAO, AutoCloseable {
 				System.out.println("SQLState:  " + ex.getSQLState());
 				System.out.println("Error Code:" + ex.getErrorCode());
 				System.out.println("Message:   " + ex.getMessage());
+				System.out.println("Statement:   " + statement);
 				Throwable t = ex.getCause();
 				while (t != null) {
 					System.out.println("Cause:" + t);
@@ -80,18 +81,10 @@ public class FileDAOImpl implements FileDAO, AutoCloseable {
 				}
 				ex = ex.getNextException();
 			}
-
-			try {
-				// close the sql connection
-				conn.close();
-			} catch (SQLException exc) {
-				System.out.println("Message:   " + exc.getMessage());
-			}
-		}
+		} 
 
 		return result;
 	}
-
 
 	public void close() throws SQLException {
 		conn.close();
